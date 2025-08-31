@@ -1,0 +1,98 @@
+/*
+  # Türkiye'nin 81 İli
+
+  1. New Data
+    - Türkiye'nin tüm 81 ilini `cities` tablosuna ekler
+    - Her ilin plaka kodu ve adı ile birlikte
+    
+  2. Changes
+    - Mevcut test şehirlerini temizler
+    - Alfabetik sırayla tüm illeri ekler
+*/
+
+-- Mevcut test verilerini temizle
+DELETE FROM cities WHERE name IN ('İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya');
+
+-- Türkiye'nin 81 ilini ekle
+INSERT INTO cities (name, code, is_active) VALUES 
+  ('Adana', '01', true),
+  ('Adıyaman', '02', true),
+  ('Afyonkarahisar', '03', true),
+  ('Ağrı', '04', true),
+  ('Amasya', '05', true),
+  ('Ankara', '06', true),
+  ('Antalya', '07', true),
+  ('Artvin', '08', true),
+  ('Aydın', '09', true),
+  ('Balıkesir', '10', true),
+  ('Bilecik', '11', true),
+  ('Bingöl', '12', true),
+  ('Bitlis', '13', true),
+  ('Bolu', '14', true),
+  ('Burdur', '15', true),
+  ('Bursa', '16', true),
+  ('Çanakkale', '17', true),
+  ('Çankırı', '18', true),
+  ('Çorum', '19', true),
+  ('Denizli', '20', true),
+  ('Diyarbakır', '21', true),
+  ('Edirne', '22', true),
+  ('Elazığ', '23', true),
+  ('Erzincan', '24', true),
+  ('Erzurum', '25', true),
+  ('Eskişehir', '26', true),
+  ('Gaziantep', '27', true),
+  ('Giresun', '28', true),
+  ('Gümüşhane', '29', true),
+  ('Hakkâri', '30', true),
+  ('Hatay', '31', true),
+  ('Isparta', '32', true),
+  ('Mersin', '33', true),
+  ('İstanbul', '34', true),
+  ('İzmir', '35', true),
+  ('Kars', '36', true),
+  ('Kastamonu', '37', true),
+  ('Kayseri', '38', true),
+  ('Kırklareli', '39', true),
+  ('Kırşehir', '40', true),
+  ('Kocaeli', '41', true),
+  ('Konya', '42', true),
+  ('Kütahya', '43', true),
+  ('Malatya', '44', true),
+  ('Manisa', '45', true),
+  ('Kahramanmaraş', '46', true),
+  ('Mardin', '47', true),
+  ('Muğla', '48', true),
+  ('Muş', '49', true),
+  ('Nevşehir', '50', true),
+  ('Niğde', '51', true),
+  ('Ordu', '52', true),
+  ('Rize', '53', true),
+  ('Sakarya', '54', true),
+  ('Samsun', '55', true),
+  ('Siirt', '56', true),
+  ('Sinop', '57', true),
+  ('Sivas', '58', true),
+  ('Tekirdağ', '59', true),
+  ('Tokat', '60', true),
+  ('Trabzon', '61', true),
+  ('Tunceli', '62', true),
+  ('Şanlıurfa', '63', true),
+  ('Uşak', '64', true),
+  ('Van', '65', true),
+  ('Yozgat', '66', true),
+  ('Zonguldak', '67', true),
+  ('Aksaray', '68', true),
+  ('Bayburt', '69', true),
+  ('Karaman', '70', true),
+  ('Kırıkkale', '71', true),
+  ('Batman', '72', true),
+  ('Şırnak', '73', true),
+  ('Bartın', '74', true),
+  ('Ardahan', '75', true),
+  ('Iğdır', '76', true),
+  ('Yalova', '77', true),
+  ('Karabük', '78', true),
+  ('Kilis', '79', true),
+  ('Osmaniye', '80', true),
+  ('Düzce', '81', true);
