@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Users, Settings, Shield, FileText, Calculator } from 'lucide-react-native';
+import { Home, Users, Settings, Shield, FileText, Calculator, MapPin } from 'lucide-react-native';
 import { usePermissions } from '@/hooks/usePermissions';
 
 export default function TabLayout() {
@@ -22,9 +22,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Ana Sayfa',
-          tabBarIcon: ({ size, color }) => (
-            <Home size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       
@@ -32,10 +30,18 @@ export default function TabLayout() {
         name="customers"
         options={{
           title: 'Müşteriler',
-          tabBarIcon: ({ size, color }) => (
-            <Users size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Users size={size} color={color} />,
           href: hasPermission('sales.customers.view') ? '/customers' : null,
+        }}
+      />
+
+      {/* YENİ EKLENEN ZİYARETLER SEKMESİ */}
+      <Tabs.Screen
+        name="visits"
+        options={{
+          title: 'Ziyaretler',
+          tabBarIcon: ({ size, color }) => <MapPin size={size} color={color} />,
+          href: hasPermission('visits.create') ? '/(tabs)/visits' : null,
         }}
       />
 
@@ -43,9 +49,7 @@ export default function TabLayout() {
         name="hr"
         options={{
           title: 'İK',
-          tabBarIcon: ({ size, color }) => (
-            <FileText size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <FileText size={size} color={color} />,
         }}
       />
 
@@ -53,9 +57,7 @@ export default function TabLayout() {
         name="calculator"
         options={{
           title: 'Hesaplayıcı',
-          tabBarIcon: ({ size, color }) => (
-            <Calculator size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Calculator size={size} color={color} />,
         }}
       />
 
@@ -63,9 +65,7 @@ export default function TabLayout() {
         name="(admin)"
         options={{
           title: 'Yönetim',
-          tabBarIcon: ({ size, color }) => (
-            <Shield size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Shield size={size} color={color} />,
           href: hasPermission('admin.roles.manage') || hasPermission('admin.staff.manage') || hasPermission('admin.teams.manage') || hasPermission('admin.products.manage') ? '/(admin)' : null,
         }}
       />
@@ -74,9 +74,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Ayarlar',
-          tabBarIcon: ({ size, color }) => (
-            <Settings size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
         }}
       />
     </Tabs>
