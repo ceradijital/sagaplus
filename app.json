@@ -38,7 +38,8 @@
         {
           "cameraPermission": "Uygulama, ziyaret kanıtı olarak fotoğraf çekebilmek için kameranıza erişim istiyor."
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true

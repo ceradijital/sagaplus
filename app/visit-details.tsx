@@ -11,16 +11,13 @@ import {
   Modal,
   TextInput,
   Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Camera as CameraIcon, Check, Mic, X, Repeat, Building, ArrowLeft } from 'lucide-react-native';
+import { Camera as CameraIcon, Check, X, Repeat, Building, ArrowLeft } from 'lucide-react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
-import Voice, { SpeechErrorEvent, SpeechResultsEvent } from '@react-native-community/voice';
-import * as FileSystem from 'expo-file-system';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const visitResults = [
@@ -33,11 +30,11 @@ const visitResults = [
 export default function VisitDetailsScreen() {
   const { visitId } = useLocalSearchParams();
   const router = useRouter();
-  
+
   const [visit, setVisit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [visitResult, setVisitResult] = useState('');
   const [notes, setNotes] = useState('');
   const [customerIdentifier, setCustomerIdentifier] = useState('');
@@ -47,67 +44,8 @@ export default function VisitDetailsScreen() {
   const [showCamera, setShowCamera] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
-  const [isRecording, setIsRecording] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  // --- Voice Listeners ---
-  useEffect(() => {
-    const onSpeechStart = () => setIsRecording(true);
-    const onSpeechEnd = () => setIsRecording(false);
-    const onSpeechError = (e: SpeechErrorEvent) => {
-      console.error('onSpeechError:', e.error);
-      setIsRecording(false);
-      Alert.alert('Ses Tanıma Hatası', e.error?.message || 'Bilinmeyen bir hata oluştu.');
-    };
-    const onSpeechResults = (e: SpeechResultsEvent) => {
-      if (e.value && e.value.length > 0) {
-        setNotes(prev => (prev ? `${prev} ${e.value![0]}` : e.value![0]));
-      }
-    };
-
-    Voice.onSpeechStart = onSpeechStart;
-    Voice.onSpeechEnd = onSpeechEnd;
-    Voice.onSpeechError = onSpeechError;
-    Voice.onSpeechResults = onSpeechResults;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  // --- Android runtime mikrofon izni ---
-  const requestAudioPermission = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-        {
-          title: "Mikrofon İzni",
-          message: "Ziyaret notlarını sesli olarak kaydedebilmek için mikrofon izni gerekli",
-          buttonNeutral: "Sonra Sor",
-          buttonNegative: "İptal",
-          buttonPositive: "Tamam",
-        }
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
-    return true;
-  };
-
-  const toggleRecording = async () => {
-    const hasPermission = await requestAudioPermission();
-    if (!hasPermission) { Alert.alert('Mikrofon izni verilmedi'); return; }
-
-    if (isRecording) {
-      try { await Voice.stop(); } catch (e) { console.error('Voice.stop hatası:', e); }
-    } else {
-      try { await Voice.start('tr-TR'); } 
-      catch (e) {
-        console.error('[HATA] Voice.start çöktü:', e);
-        Alert.alert("Mikrofon Hatası", "Ses tanıma başlatılamadı. Lütfen tekrar deneyin veya uygulama izinlerinizi kontrol edin.");
-      }
-    }
-  };
 
   // --- Fetch visit ---
   useEffect(() => {
@@ -125,7 +63,10 @@ export default function VisitDetailsScreen() {
 
   const handleTakePhoto = async () => {
     const { status } = await requestCameraPermission();
-    if (status !== 'granted') { Alert.alert('İzin Gerekli', 'Fotoğraf çekmek için kamera izni vermelisiniz.'); return; }
+    if (status !== 'granted') { 
+      Alert.alert('İzin Gerekli', 'Fotoğraf çekmek için kamera izni vermelisiniz.'); 
+      return; 
+    }
     setShowCamera(true);
   };
 
@@ -226,7 +167,7 @@ export default function VisitDetailsScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>Müşteri / İşletme Bilgisi</Text>
         <TextInput style={styles.input} placeholder="Müşteri Adı veya İşletme Adı" value={customerIdentifier} onChangeText={setCustomerIdentifier}/>
-        <Text style={styles.sectionTitle}>Ziyaret Kanıtı</Text>
+        <Text style={styles.sectionTitle}>Ziyaret Görseli</Text>
         <TouchableOpacity style={styles.photoButton} onPress={handleTakePhoto}>
           {photoUri ? <Image source={{ uri: photoUri }} style={styles.photoPreview} /> : (<><CameraIcon size={24} color="#1E40AF" /><Text style={styles.photoButtonText}>Fotoğraf Çek</Text></>)}
         </TouchableOpacity>
@@ -256,13 +197,8 @@ export default function VisitDetailsScreen() {
         )}
 
         <Text style={styles.sectionTitle}>Notlar</Text>
-        <View style={styles.notesContainer}>
-          <TextInput style={styles.notesInput} placeholder="Ziyaret ile ilgili notlarınızı buraya yazın veya mikrofonu kullanın..." multiline value={notes} onChangeText={setNotes} />
-          <TouchableOpacity style={[styles.micButton, isRecording && styles.micButtonRecording]} onPress={toggleRecording}>
-            <Mic size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-
+        <TextInput style={styles.notesInput} placeholder="Ziyaret ile ilgili notlarınızı buraya yazın..." multiline value={notes} onChangeText={setNotes} />
+        
         <TouchableOpacity style={[styles.endVisitButton, isSubmitting && { opacity: 0.7 }]} onPress={handleEndVisit} disabled={isSubmitting}>
           {isSubmitting ? <ActivityIndicator color="white" /> : <Text style={styles.endVisitButtonText}>Ziyareti Bitir ve Kaydet</Text>}
         </TouchableOpacity>
@@ -286,10 +222,7 @@ const styles = StyleSheet.create({
   resultButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#CBD5E1', flexBasis: '48%', flexGrow: 1, gap: 8 },
   resultText: { fontSize: 14, fontWeight: '500', color: '#334155' },
   selectedResultText: { color: 'white' },
-  notesContainer: { flexDirection: 'row', alignItems: 'flex-start' },
-  notesInput: { flex: 1, height: 120, backgroundColor: 'white', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#CBD5E1', textAlignVertical: 'top', fontSize: 16, color: '#1E293B' },
-  micButton: { padding: 12, backgroundColor: '#2563EB', borderRadius: 8, marginLeft: 10, justifyContent: 'center', alignItems: 'center', height: 50 },
-  micButtonRecording: { backgroundColor: '#EF4444' },
+  notesInput: { height: 120, backgroundColor: 'white', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#CBD5E1', textAlignVertical: 'top', fontSize: 16, color: '#1E293B' },
   endVisitButton: { backgroundColor: '#16A34A', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 30 },
   endVisitButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   cameraContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 50 },
